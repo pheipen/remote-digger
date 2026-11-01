@@ -210,6 +210,14 @@
     nav .pill { padding: 0 16px; }
   }
   @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } .stage { height: auto; } .sticky { position: static; } }
+  /* real 3D model (assets/3d), the page scrolls normally while it turns */
+  .hero .wrap { align-items: center; }
+  .hero-text { position: static; padding-top: 0; }
+  .stage3d { position: relative; height: 700px; }
+  #phone3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .ground3d { position: absolute; left: 50%; bottom: 18px; width: 240px; height: 40px; margin-left: -120px; border-radius: 50%;
+              background: radial-gradient(closest-side, rgb(21 23 58 / .28), transparent); filter: blur(6px); }
+  @media (max-width: 900px) { .stage3d { height: 560px; } }
 </style>
 </head>
 <body>
@@ -234,45 +242,7 @@
       <div class="meta">Version 2.1 · 95 MB · für Macs mit M1 oder neuer · <a href="#installieren">So geht's</a></div>
     </div>
 
-    <div class="stage" aria-hidden="true"><div class="sticky">
-    <div class="phone">
-      <!-- .slice layers (rounded corners) are added by the script below; walls make the straight edges smooth -->
-      <i class="wall l"></i><i class="wall r"></i><i class="wall t"></i><i class="wall b"></i>
-      <i class="key l action"></i><i class="key l vol-up"></i><i class="key l vol-down"></i>
-      <i class="key r power"></i><i class="key r camctl"></i>
-      <div class="face back">
-        <div class="plateau"><i class="lens a"></i><i class="lens b"></i><i class="lens c"></i><i class="flash"></i><i class="mic"></i><i class="lidar"></i></div>
-      </div>
-      <div class="face front"><div class="bezel"><div class="screen">
-        <div class="island"></div>
-        <div class="status">
-          <span>9:41</span>
-          <span class="icons">
-            <svg viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="6" rx="1"/><rect x="10" y="2.5" width="3" height="8.5" rx="1"/><rect x="15" y="0" width="3" height="11" rx="1"/></svg>
-            <svg viewBox="0 0 16 11"><path d="M8 2.2c2.4 0 4.6.9 6.2 2.5l1.2-1.2C13.5 1.6 10.9.5 8 .5S2.5 1.6.6 3.5l1.2 1.2C3.4 3.1 5.6 2.2 8 2.2zm0 3.4c1.5 0 2.8.6 3.8 1.5L13 5.9C11.7 4.6 9.9 3.9 8 3.9S4.3 4.6 3 5.9l1.2 1.2C5.2 6.2 6.5 5.6 8 5.6zm0 3.3c.6 0 1.1.2 1.5.6L8 11 6.5 9.5c.4-.4.9-.6 1.5-.6z"/></svg>
-            <svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="22" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="16.5" height="8" rx="2"/><path d="M24 4.2v3.6c.8-.3 1.3-1 1.3-1.8s-.5-1.5-1.3-1.8z" fill-opacity=".45"/></svg>
-          </span>
-        </div>
-        <div class="m-card">
-          <div class="m-top"><span class="m-label">Läuft auf samplette</span><span class="m-badge"><i></i>Mac</span></div>
-          <div>
-            <div class="m-title">Melodie d'Aout (Extended)</div>
-            <div class="m-channel">Bochum Welt</div>
-            <div class="m-bar"><i></i></div>
-            <div class="m-meta"><span>Spielt</span><span>WAV</span></div>
-          </div>
-        </div>
-        <div class="m-next"><span>Next</span><svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 9 L30 22 L10 35 Z"/><path d="M35 9 V35"/></svg></div>
-        <div class="m-row">
-          <div class="m-btn"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M7 5 H11 V21 H7 Z M15 5 H19 V21 H15 Z"/></svg>Pause</div>
-          <div class="m-btn saved"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 13.5 L10.5 18.5 L20.5 7.5"/></svg>Gespeichert</div>
-        </div>
-        <div class="m-foot">3 WAVs heute gespeichert</div>
-        <div class="homebar"></div>
-      </div></div></div>
-    </div>
-    <div class="ground"></div>
-    </div></div>
+    <div class="stage3d" aria-hidden="true"><canvas id="phone3d"></canvas><div class="ground3d"></div></div>
   </div>
 </header>
 
@@ -355,50 +325,11 @@
 <footer>
   <div class="wrap">
     <span class="serif" style="font-size:22px;color:var(--ink)">Remote Digger</span>
-    <p>Privates Projekt, ohne Gewähr. Bitte nur Inhalte laden, die du herunterladen darfst. Enthält yt-dlp (Unlicense) und FFmpeg (GPL, Quellcode auf ffmpeg.org). Schriften: Instrument Serif und Inter Tight (SIL Open Font License).</p>
+    <p>Privates Projekt, ohne Gewähr. Bitte nur Inhalte laden, die du herunterladen darfst. Enthält yt-dlp (Unlicense) und FFmpeg (GPL, Quellcode auf ffmpeg.org). Schriften: Instrument Serif und Inter Tight (SIL Open Font License).  3D Modell „iPhone 17 Pro“ von <a href="https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec">Ranguel</a> (CC BY 4.0, angepasst: Display und Farbe), keine offizielle Darstellung von Apple.</p>
   </div>
 </footer>
 
-<script>
-// 3D iPhone: thin aluminium slices between front and back give it its body; while the (sticky) stage scrolls past,
-// the phone turns once around (front -> back -> front) and light, reflections and ground shadow follow the angle.
-(() => {
-  const phone = document.querySelector(".phone"), stage = document.querySelector(".stage"), sticky = document.querySelector(".sticky");
-  if (!phone) return;
-  const depth = 36, n = 40;   // 8.75 mm on a 71.5 mm wide phone ≈ 36 px at 300 px
-  for (let i = 0; i < n; i++) {
-    const s = document.createElement("div");
-    s.className = "slice";
-    const z = -depth / 2 + (i + .5) * depth / n, round = 1 - Math.abs(z) / (depth / 2);   // edges darker towards front/back = rounded rim
-    s.style.transform = `translateZ(${z.toFixed(2)}px)`;
-    s.style.filter = `brightness(${(.8 + round * .28).toFixed(3)})`;
-    phone.prepend(s);
-  }
-  const rad = Math.PI / 180;
-  const pose = (t) => {
-    const a = -24 + t * 360;
-    phone.style.transform = `rotateX(${(8 - 5 * Math.sin(t * Math.PI)).toFixed(2)}deg) rotateY(${a.toFixed(2)}deg) rotateZ(${(3 * Math.cos(t * 2 * Math.PI)).toFixed(2)}deg)`;
-    const light = Math.cos((a + 20) * rad);                       // light from the front left
-    phone.style.setProperty("--shade-front", Math.max(0, (1 - light) * .32).toFixed(3));
-    phone.style.setProperty("--shade-back", Math.max(.03, (1 + light) * .16).toFixed(3));
-    phone.style.setProperty("--glare", `${(50 + 40 * Math.sin(a * rad)).toFixed(1)}%`);
-    phone.style.setProperty("--glare-back", `${(50 - 40 * Math.sin(a * rad)).toFixed(1)}%`);
-    phone.style.setProperty("--edge", `${(50 + 42 * Math.sin(a * rad)).toFixed(1)}%`);
-    const w = Math.abs(Math.cos(a * rad)) * 300 + Math.abs(Math.sin(a * rad)) * depth;
-    document.querySelector(".ground").style.setProperty("--ground", (.25 + .75 * w / 300).toFixed(3));
-  };
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return pose(0);
-  let queued = false;
-  const update = () => {
-    queued = false;
-    const top = parseFloat(getComputedStyle(sticky).top) || 0, r = stage.getBoundingClientRect();
-    pose(Math.max(0, Math.min(1, (top - r.top) / Math.max(1, r.height - sticky.offsetHeight))));
-  };
-  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-  addEventListener("scroll", queue, { passive: true });
-  addEventListener("resize", queue);
-  update();
-})();
-</script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
+<script type="module" src="assets/phone3d.js"></script>
 </body>
 </html>
