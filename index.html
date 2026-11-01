@@ -41,7 +41,8 @@
 
   /* hero */
   .hero { padding: 56px 0 96px; }
-  .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: start; }
+  .hero-text { position: sticky; top: max(96px, calc(50vh - 280px)); padding-top: 40px; }
   h1 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(60px, 8.4vw, 116px); line-height: .94;
        letter-spacing: -.02em; margin: 18px 0 24px; }
   h1 em { font-style: italic; color: var(--cobalt); }
@@ -54,18 +55,55 @@
   .meta { margin-top: 14px; font-size: 14px; color: var(--muted); }
   .meta a { color: var(--cobalt); font-weight: 600; text-decoration: none; }
 
-  /* iPhone 18 Pro (silver aluminium) with the real remote on screen, built in CSS */
-  .phone { position: relative; justify-self: center; width: 300px; height: 624px; border-radius: 54px; padding: 4px;
-           transform: perspective(1400px) rotateX(4deg) rotateY(-18deg) rotateZ(2deg); will-change: transform;
-           background: linear-gradient(140deg, #f4f5f7 0%, #b9bcc3 14%, #e9ebee 32%, #a3a7af 52%, #dcdee2 74%, #9b9fa7 90%, #e6e8eb 100%);
-           box-shadow: inset 0 0 0 1px rgb(255 255 255 / .7), inset 0 0 3px 1px rgb(0 0 0 / .25),
-                       0 60px 90px -40px rgb(21 23 58 / .55), 0 24px 40px -24px rgb(21 23 58 / .35); }
-  .phone .btn-side { position: absolute; width: 4px; border-radius: 2px;
-                     background: linear-gradient(90deg, #8e929a, #e8eaed 45%, #a6aab1); box-shadow: 0 0 1px rgb(0 0 0 / .35); }
-  .phone .l { left: -3px; } .phone .r { right: -3px; }
-  .phone .action { top: 104px; height: 26px; } .phone .vol-up { top: 150px; height: 46px; } .phone .vol-down { top: 206px; height: 46px; }
-  .phone .power { top: 168px; height: 74px; }
-  .phone .camctl { top: 330px; height: 46px; background: linear-gradient(90deg, #3c3f45, #8d9097 50%, #3c3f45); }
+  /* iPhone 18 Pro (silver) as a real 3D object: stacked aluminium slices give the 8.75 mm body its rounded edge,
+     front = display with the real remote, back = glass with the camera plateau. Scroll turns it once around. */
+  .stage { height: 190vh; }
+  .sticky { position: sticky; top: max(84px, calc(50vh - 340px)); height: 680px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; perspective: 1700px; }
+  .phone { position: relative; width: 300px; height: 624px; transform-style: preserve-3d; will-change: transform;
+           transform: rotateX(8deg) rotateY(-24deg) rotateZ(3deg); }
+  .slice { position: absolute; inset: 0; border-radius: 54px;
+           background: linear-gradient(90deg, #8c9098, #eceef1 var(--edge, 50%), #9a9ea6); background-size: 100% 100%; }
+  .wall { position: absolute; background: linear-gradient(90deg, #7d8189, #edeff2 var(--edge, 50%), #878b93); }
+  .wall.l { left: 0; top: 54px; bottom: 54px; width: 36px; transform-origin: left center; transform: translateZ(-18px) rotateY(-90deg); }
+  .wall.r { right: 0; top: 54px; bottom: 54px; width: 36px; transform-origin: right center; transform: translateZ(-18px) rotateY(90deg); }
+  .wall.t { top: 0; left: 54px; right: 54px; height: 36px; transform-origin: center top; transform: translateZ(-18px) rotateX(90deg);
+            background: linear-gradient(180deg, #7d8189, #e4e6e9 50%, #878b93); }
+  .wall.b { bottom: 0; left: 54px; right: 54px; height: 36px; transform-origin: center bottom; transform: translateZ(-18px) rotateX(-90deg);
+            background: linear-gradient(180deg, #7d8189, #c9ccd1 50%, #878b93); }
+  .face { position: absolute; inset: 0; border-radius: 54px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+  .face::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 5; background: #000; }
+  .front { transform: translateZ(18.5px); padding: 4px;
+           background: linear-gradient(140deg, #f4f5f7, #b9bcc3 16%, #e9ebee 34%, #a3a7af 54%, #dcdee2 76%, #9b9fa7 92%, #e6e8eb);
+           box-shadow: inset 0 0 0 1px rgb(255 255 255 / .7); }
+  .front::before { opacity: var(--shade-front, 0); }
+  .back { transform: rotateY(180deg) translateZ(18.5px);
+          background: linear-gradient(160deg, #eef0f3 0%, #d9dce1 40%, #e7e9ec 70%, #cfd2d8 100%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .6); }
+  .back::before { opacity: var(--shade-back, .3); }
+  .back::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+                 background: linear-gradient(118deg, transparent 25%, rgb(255 255 255 / .45) 40%, transparent 56%);
+                 background-size: 300% 100%; background-position: var(--glare-back, 60%) 0; }
+  .plateau { position: absolute; left: 0; right: 0; top: 0; height: 196px; border-radius: 54px 54px 30px 30px;
+             background: linear-gradient(90deg, #a9adb5, #eceef1 45%, #b4b8bf); box-shadow: 0 2px 0 rgb(0 0 0 / .08), inset 0 -1px 0 rgb(255 255 255 / .7); }
+  .lens { position: absolute; width: 74px; height: 74px; border-radius: 50%;
+          background: radial-gradient(circle at 50% 50%, #05070d 0 30%, #1b2338 31%, #0a0d17 44%, #2a2f3a 52%, #6e737c 56%, #d7dade 60%, #8a8f98 70%, #c4c7cd 100%);
+          box-shadow: 0 3px 6px rgb(0 0 0 / .35), inset 0 0 0 1px rgb(0 0 0 / .25); }
+  .lens::after { content: ""; position: absolute; left: 27px; top: 24px; width: 12px; height: 8px; border-radius: 50%;
+                 background: rgb(150 170 255 / .55); filter: blur(1.5px); transform: rotate(-25deg); }
+  .lens.a { left: 20px; top: 18px; } .lens.b { left: 20px; top: 104px; } .lens.c { left: 98px; top: 61px; }
+  .flash { position: absolute; right: 30px; top: 36px; width: 22px; height: 22px; border-radius: 50%;
+           background: radial-gradient(circle, #fff9e6 0 35%, #e8dcc0 60%, #b9bcc3 100%); box-shadow: inset 0 0 0 1px rgb(0 0 0 / .15); }
+  .lidar { position: absolute; right: 32px; top: 132px; width: 18px; height: 18px; border-radius: 50%;
+           background: radial-gradient(circle, #2b2f3a 0 40%, #11141c 70%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2); }
+  .mic { position: absolute; right: 38px; top: 96px; width: 6px; height: 6px; border-radius: 50%; background: #585d66; }
+  .key { position: absolute; width: 12px; border-radius: 3px; background: linear-gradient(180deg, #e9ebee, #a2a6ae 60%, #cdd0d5); }
+  .key.l { left: -1.5px; transform-origin: left center; transform: translateZ(-6px) rotateY(-90deg); }
+  .key.r { right: -1.5px; transform-origin: right center; transform: translateZ(-6px) rotateY(90deg); }
+  .key.action { top: 104px; height: 26px; } .key.vol-up { top: 150px; height: 46px; } .key.vol-down { top: 206px; height: 46px; }
+  .key.power { top: 168px; height: 74px; }
+  .key.camctl { top: 330px; height: 46px; background: linear-gradient(180deg, #4a4e56, #9a9ea6 50%, #3c3f45); }
+  .ground { width: 250px; height: 46px; margin-top: 28px; border-radius: 50%; background: radial-gradient(closest-side, rgb(21 23 58 / .32), transparent);
+            filter: blur(6px); transform: scaleX(var(--ground, 1)); }
   .bezel { height: 100%; border-radius: 50px; background: #050506; padding: 7px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .06); }
   .screen { position: relative; height: 100%; border-radius: 43px; background: var(--cream); padding: 48px 14px 26px;
             display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
@@ -156,7 +194,10 @@
 
   @media (max-width: 900px) {
     .hero { padding: 24px 0 72px; }
-    .hero .wrap { grid-template-columns: 1fr; gap: 56px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 24px; }
+    .hero-text { position: static; padding-top: 0; }
+    .stage { height: 170vh; }
+    .sticky { top: max(64px, calc(50vh - 330px)); transform: scale(.86); }
     .buttons, .grid, .steps { grid-template-columns: 1fr; }
     .btn { min-height: 200px; }
     section { padding: 72px 0; }
@@ -168,7 +209,7 @@
     .lead { font-size: 18px; }
     nav .pill { padding: 0 16px; }
   }
-  @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } .phone { transform: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } .stage { height: auto; } .sticky { position: static; } }
 </style>
 </head>
 <body>
@@ -182,7 +223,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div>
+    <div class="hero-text">
       <div class="kicker">Für samplette.io · Mac + iPhone</div>
       <h1>Diggen,<br>ohne <em>aufzustehen.</em></h1>
       <p class="lead">Remote Digger macht dein iPhone zur Fernbedienung für samplette.io. Nächster Song, Pause, und den Treffer direkt als WAV auf den Mac. Egal ob du in der Küche stehst oder auf dem Sofa liegst.</p>
@@ -193,10 +234,16 @@
       <div class="meta">Version 2.1 · 95 MB · macOS 14 oder neuer, Apple Chip · <a href="#installieren">So geht's</a></div>
     </div>
 
-    <div class="phone" aria-hidden="true">
-      <i class="btn-side l action"></i><i class="btn-side l vol-up"></i><i class="btn-side l vol-down"></i>
-      <i class="btn-side r power"></i><i class="btn-side r camctl"></i>
-      <div class="bezel"><div class="screen">
+    <div class="stage" aria-hidden="true"><div class="sticky">
+    <div class="phone">
+      <!-- .slice layers (rounded corners) are added by the script below; walls make the straight edges smooth -->
+      <i class="wall l"></i><i class="wall r"></i><i class="wall t"></i><i class="wall b"></i>
+      <i class="key l action"></i><i class="key l vol-up"></i><i class="key l vol-down"></i>
+      <i class="key r power"></i><i class="key r camctl"></i>
+      <div class="face back">
+        <div class="plateau"><i class="lens a"></i><i class="lens b"></i><i class="lens c"></i><i class="flash"></i><i class="mic"></i><i class="lidar"></i></div>
+      </div>
+      <div class="face front"><div class="bezel"><div class="screen">
         <div class="island"></div>
         <div class="status">
           <span>9:41</span>
@@ -222,8 +269,10 @@
         </div>
         <div class="m-foot">3 WAVs heute gespeichert</div>
         <div class="homebar"></div>
-      </div></div>
+      </div></div></div>
     </div>
+    <div class="ground"></div>
+    </div></div>
   </div>
 </header>
 
@@ -311,17 +360,39 @@
 </footer>
 
 <script>
-// The iPhone turns while it passes through the window: -1 = just coming in from below, 0 = centred, 1 = leaving at the top.
+// 3D iPhone: thin aluminium slices between front and back give it its body; while the (sticky) stage scrolls past,
+// the phone turns once around (front -> back -> front) and light, reflections and ground shadow follow the angle.
 (() => {
-  const phone = document.querySelector(".phone");
-  if (!phone || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const phone = document.querySelector(".phone"), stage = document.querySelector(".stage"), sticky = document.querySelector(".sticky");
+  if (!phone) return;
+  const depth = 36, n = 40;   // 8.75 mm on a 71.5 mm wide phone ≈ 36 px at 300 px
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("div");
+    s.className = "slice";
+    const z = -depth / 2 + (i + .5) * depth / n, round = 1 - Math.abs(z) / (depth / 2);   // edges darker towards front/back = rounded rim
+    s.style.transform = `translateZ(${z.toFixed(2)}px)`;
+    s.style.filter = `brightness(${(.8 + round * .28).toFixed(3)})`;
+    phone.prepend(s);
+  }
+  const rad = Math.PI / 180;
+  const pose = (t) => {
+    const a = -24 + t * 360;
+    phone.style.transform = `rotateX(${(8 - 5 * Math.sin(t * Math.PI)).toFixed(2)}deg) rotateY(${a.toFixed(2)}deg) rotateZ(${(3 * Math.cos(t * 2 * Math.PI)).toFixed(2)}deg)`;
+    const light = Math.cos((a + 20) * rad);                       // light from the front left
+    phone.style.setProperty("--shade-front", Math.max(0, (1 - light) * .32).toFixed(3));
+    phone.style.setProperty("--shade-back", Math.max(.03, (1 + light) * .16).toFixed(3));
+    phone.style.setProperty("--glare", `${(50 + 40 * Math.sin(a * rad)).toFixed(1)}%`);
+    phone.style.setProperty("--glare-back", `${(50 - 40 * Math.sin(a * rad)).toFixed(1)}%`);
+    phone.style.setProperty("--edge", `${(50 + 42 * Math.sin(a * rad)).toFixed(1)}%`);
+    const w = Math.abs(Math.cos(a * rad)) * 300 + Math.abs(Math.sin(a * rad)) * depth;
+    document.querySelector(".ground").style.setProperty("--ground", (.25 + .75 * w / 300).toFixed(3));
+  };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return pose(0);
   let queued = false;
   const update = () => {
     queued = false;
-    const r = phone.getBoundingClientRect();
-    const p = Math.max(-1, Math.min(1, (innerHeight / 2 - (r.top + r.height / 2)) / (innerHeight / 2 + r.height / 2)));
-    phone.style.transform = `perspective(1400px) rotateX(${(4 - p * 10).toFixed(2)}deg) rotateY(${(-18 + p * 46).toFixed(2)}deg) rotateZ(${(2 - p * 4).toFixed(2)}deg)`;
-    phone.style.setProperty("--glare", `${(30 + p * 45).toFixed(1)}%`);
+    const top = parseFloat(getComputedStyle(sticky).top) || 0, r = stage.getBoundingClientRect();
+    pose(Math.max(0, Math.min(1, (top - r.top) / Math.max(1, r.height - sticky.offsetHeight))));
   };
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
   addEventListener("scroll", queue, { passive: true });
