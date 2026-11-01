@@ -145,7 +145,7 @@
   .intro { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 48px; }
 
   .buttons { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
-  .btn { border-radius: var(--r-lg); padding: 28px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; }
+  .btn { border-radius: var(--r-lg); padding: 28px; min-height: 260px; display: flex; flex-direction: column; justify-content: flex-start; gap: 64px; }
   .btn h3 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 48px; line-height: 1; margin: 0; }
   .btn p { margin: 0; font-size: 16px; line-height: 1.45; }
   .btn svg { width: 40px; height: 40px; }
@@ -199,7 +199,7 @@
     .stage { height: 170vh; }
     .sticky { top: max(64px, calc(50vh - 330px)); transform: scale(.86); }
     .buttons, .grid, .steps { grid-template-columns: 1fr; }
-    .btn { min-height: 200px; }
+    .btn { min-height: 200px; gap: 40px; }
     section { padding: 72px 0; }
     .features { margin: 0 8px; border-radius: 32px; }
   }
@@ -262,7 +262,7 @@
       </div>
       <div class="btn b-wav">
         <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4 V17 M7.5 11.5 L13 17 L18.5 11.5 M5 22 H21"/></svg>
-        <div><h3>Download</h3><p>Der laufende Song landet als WAV in deinem Sampleordner. Auf dem Mac erscheint eine Mitteilung, sobald er da ist.</p></div>
+        <div><h3>Download</h3><p>Der laufende Song landet als WAV in deinem Sampleordner.</p></div>
       </div>
     </div>
   </div>
