@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remote Digger – samplette per iPhone steuern</title>
+<meta name="description" content="Remote Digger für den Mac: YouTube als WAV, MP3, FLAC oder MP4 laden und samplette.io vom iPhone aus steuern.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFF4E0">
+<link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/InstrumentSerif-Regular.ttf) format("truetype"); }
+  @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url(assets/InstrumentSerif-Italic.ttf) format("truetype"); }
+  @font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(assets/InterTight.ttf) format("truetype"); }
+
+  :root {
+    color-scheme: light;
+    --cream: #FFF4E0; --cream-2: #F7E9CF; --ink: #15173A; --cobalt: #2233FF; --muted: #4A4F86;
+    --serif: "Instrument Serif", Georgia, serif; --sans: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+    --r-lg: 28px; --r-md: 24px; --wrap: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.5;
+         -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .serif { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+  .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; background: rgb(255 244 224 / .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand img { width: 36px; height: 36px; border-radius: 9px; box-shadow: 0 0 0 1px rgb(21 23 58 / .08); }
+  .brand span { font-family: var(--serif); font-style: italic; font-size: 26px; line-height: 1; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 999px; background: var(--ink);
+          color: var(--cream); text-decoration: none; font-weight: 600; font-size: 15px; transition: transform .12s ease-out; }
+  .pill:active, .cta:active, .btn:active { transform: scale(.98); }
+
+  /* hero */
+  .hero { padding: 56px 0 96px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  h1 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(60px, 8.4vw, 116px); line-height: .94;
+       letter-spacing: -.02em; margin: 18px 0 24px; }
+  h1 em { font-style: italic; color: var(--cobalt); }
+  .lead { font-size: 20px; line-height: 1.45; color: var(--muted); max-width: 30em; margin: 0 0 36px; }
+  .cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-width: 300px; height: 88px; padding: 0 28px;
+         border-radius: var(--r-lg); background: var(--cobalt); color: var(--cream); text-decoration: none; transition: transform .12s ease-out, background-color .15s; }
+  .cta:hover { background: #1626E8; }
+  .cta .serif { font-size: 40px; line-height: 1; }
+  .cta svg { width: 34px; height: 34px; flex: none; }
+  .meta { margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .meta a { color: var(--cobalt); font-weight: 600; text-decoration: none; }
+
+  /* phone mockup: the real remote, scaled down */
+  .phone { justify-self: center; width: 300px; height: 620px; border-radius: 50px; background: var(--ink); padding: 11px;
+           box-shadow: 0 40px 80px -30px rgb(21 23 58 / .45); transform: rotate(3deg); }
+  .screen { height: 100%; border-radius: 40px; background: var(--cream); padding: 40px 14px 22px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  .m-card { flex: 1; background: var(--cobalt); color: var(--cream); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .m-top { display: flex; justify-content: space-between; align-items: center; }
+  .m-label { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+  .m-badge { display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; background: rgb(255 244 224 / .14); font-size: 10px; font-weight: 600; }
+  .m-badge i { width: 5px; height: 5px; border-radius: 50%; background: var(--cream); }
+  .m-title { font-family: var(--serif); font-style: italic; font-size: 34px; line-height: 1.02; }
+  .m-channel { margin-top: 6px; font-size: 11px; font-weight: 500; opacity: .8; }
+  .m-bar { margin-top: 16px; height: 3px; border-radius: 2px; background: rgb(255 244 224 / .25); overflow: hidden; }
+  .m-bar i { display: block; height: 100%; width: 38%; background: var(--cream); animation: play 24s linear infinite; }
+  @keyframes play { from { width: 8%; } to { width: 96%; } }
+  .m-meta { margin-top: 7px; display: flex; justify-content: space-between; font-size: 9px; opacity: .8; }
+  .m-next { height: 84px; border-radius: 22px; background: var(--ink); color: var(--cream); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+  .m-next span { font-family: var(--serif); font-style: italic; font-size: 36px; }
+  .m-next svg { width: 32px; height: 32px; }
+  .m-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .m-btn { height: 66px; border-radius: 18px; border: 1.5px solid var(--cobalt); color: var(--cobalt); display: flex; flex-direction: column;
+           align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 600; }
+  .m-btn.saved { background: var(--cobalt); color: var(--cream); }
+  .m-btn svg { width: 19px; height: 19px; }
+  .m-foot { text-align: center; font-size: 10px; font-weight: 500; color: var(--muted); }
+
+  /* sections */
+  section { padding: 96px 0; }
+  h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(44px, 5.6vw, 72px); line-height: 1; letter-spacing: -.015em; margin: 14px 0 20px; }
+  .intro { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 48px; }
+
+  .buttons { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
+  .btn { border-radius: var(--r-lg); padding: 28px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; }
+  .btn h3 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 48px; line-height: 1; margin: 0; }
+  .btn p { margin: 0; font-size: 16px; line-height: 1.45; }
+  .btn svg { width: 40px; height: 40px; }
+  .b-next { background: var(--ink); color: var(--cream); }
+  .b-next p { opacity: .8; }
+  .b-play { border: 2px solid var(--cobalt); color: var(--cobalt); }
+  .b-wav { background: var(--cobalt); color: var(--cream); }
+  .b-wav p { opacity: .85; }
+
+  .features { background: var(--ink); color: var(--cream); border-radius: 40px; margin: 0 16px; }
+  .features .kicker { color: rgb(255 244 224 / .6); }
+  .features .intro { color: rgb(255 244 224 / .7); }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feat { border-radius: var(--r-md); background: rgb(255 244 224 / .06); box-shadow: inset 0 0 0 1px rgb(255 244 224 / .1); padding: 26px; }
+  .feat b { display: block; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 30px; line-height: 1.05; margin-bottom: 10px; }
+  .feat span { font-size: 15px; color: rgb(255 244 224 / .72); }
+  .formats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .formats i { font-style: normal; font-size: 12px; font-weight: 700; letter-spacing: .04em; padding: 5px 10px; border-radius: 999px; background: var(--cobalt); }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s; }
+  .step { border-radius: var(--r-lg); background: var(--cream-2); padding: 28px; }
+  .step .n { font-family: var(--serif); font-style: italic; font-size: 72px; line-height: .9; color: var(--cobalt); }
+  .step h3 { font-size: 19px; font-weight: 700; margin: 18px 0 8px; }
+  .step p { margin: 0; font-size: 15.5px; color: var(--muted); }
+  .path { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--cream); border-radius: 10px; padding: 8px 12px; }
+
+  .req { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .req span { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px rgb(21 23 58 / .14); font-size: 14px; font-weight: 600; }
+  .req span::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cobalt); }
+
+  .faq { max-width: 780px; }
+  details { border-top: 1.5px solid rgb(21 23 58 / .12); }
+  details:last-child { border-bottom: 1.5px solid rgb(21 23 58 / .12); }
+  summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0;
+            font-family: var(--serif); font-style: italic; font-size: 28px; line-height: 1.1; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--sans); font-style: normal; font-size: 26px; color: var(--cobalt); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { margin: 0 0 24px; color: var(--muted); max-width: 40em; }
+
+  .final { text-align: center; }
+  .final h2 { margin-bottom: 36px; }
+  footer { padding: 40px 0 56px; font-size: 13px; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-top: 1.5px solid rgb(21 23 58 / .12); padding-top: 28px; }
+  footer p { margin: 0; max-width: 46em; }
+
+  @media (max-width: 900px) {
+    .hero { padding: 24px 0 72px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 56px; }
+    .phone { transform: none; }
+    .buttons, .grid, .steps { grid-template-columns: 1fr; }
+    .btn { min-height: 200px; }
+    section { padding: 72px 0; }
+    .features { margin: 0 8px; border-radius: 32px; }
+  }
+  @media (max-width: 480px) {
+    .wrap { padding: 0 16px; }
+    .cta { min-width: 0; width: 100%; }
+    .lead { font-size: 18px; }
+    nav .pill { padding: 0 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><img src="assets/icon.svg" alt=""><span>Remote Digger</span></a>
+    <a class="pill" href="https://github.com/pheipen/remote-digger/releases/latest/download/Remote-Digger.dmg">Laden</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Für samplette.io · Mac + iPhone</div>
+      <h1>Diggen,<br>ohne <em>aufzustehen.</em></h1>
+      <p class="lead">Remote Digger macht dein iPhone zur Fernbedienung für samplette.io. Nächster Song, Pause, und den Treffer direkt als WAV auf den Mac – egal ob du in der Küche stehst oder auf dem Sofa liegst.</p>
+      <a class="cta" href="https://github.com/pheipen/remote-digger/releases/latest/download/Remote-Digger.dmg">
+        <span class="serif">Für Mac laden</span>
+        <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 5 V23 M9.5 15.5 L17 23 L24.5 15.5 M7 29 H27"/></svg>
+      </a>
+      <div class="meta">Version 2.1 · 95 MB · macOS 14 oder neuer, Apple-Chip · <a href="#installieren">So geht's</a></div>
+    </div>
+
+    <div class="phone" aria-hidden="true">
+      <div class="screen">
+        <div class="m-card">
+          <div class="m-top"><span class="m-label">Läuft auf samplette</span><span class="m-badge"><i></i>Mac</span></div>
+          <div>
+            <div class="m-title">Melodie d'Aout (Extended)</div>
+            <div class="m-channel">Bochum Welt</div>
+            <div class="m-bar"><i></i></div>
+            <div class="m-meta"><span>Spielt</span><span>WAV</span></div>
+          </div>
+        </div>
+        <div class="m-next"><span>Next</span><svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 9 L30 22 L10 35 Z"/><path d="M35 9 V35"/></svg></div>
+        <div class="m-row">
+          <div class="m-btn"><svg viewBox="0 0 26 26" fill="currentColor"><path d="M7 5 H11 V21 H7 Z M15 5 H19 V21 H15 Z"/></svg>Pause</div>
+          <div class="m-btn saved"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 13.5 L10.5 18.5 L20.5 7.5"/></svg>Gespeichert</div>
+        </div>
+        <div class="m-foot">3 WAVs heute gespeichert</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Die Fernbedienung</div>
+    <h2>Drei Knöpfe.<br>Mehr braucht's nicht.</h2>
+    <p class="intro">Die Handy-Seite läuft direkt vom Mac, ohne App Store und ohne Konto. Einmal den QR-Code scannen, zum Home-Bildschirm hinzufügen, fertig.</p>
+    <div class="buttons">
+      <div class="btn b-next">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M10 9 L30 22 L10 35 Z"/><path d="M35 9 V35"/></svg>
+        <div><h3>Next</h3><p>Springt zum nächsten Sample, genau wie die Taste D auf samplette. Firefox oder Chrome muss dafür nicht im Vordergrund sein.</p></div>
+      </div>
+      <div class="btn b-play">
+        <svg viewBox="0 0 26 26" fill="currentColor"><path d="M8 5 L21 13 L8 21 Z"/></svg>
+        <div><h3>Play</h3><p>Pause und weiter, mit Titel, Kanal und Fortschritt auf dem iPhone.</p></div>
+      </div>
+      <div class="btn b-wav">
+        <svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4 V17 M7.5 11.5 L13 17 L18.5 11.5 M5 22 H21"/></svg>
+        <div><h3>Download</h3><p>Der laufende Song landet als WAV im Sample-Ordner. Eine Mitteilung auf dem Mac sagt, wann er da ist.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="wrap">
+    <div class="kicker">Auf dem Mac</div>
+    <h2>Alles drin,<br>nichts zu basteln.</h2>
+    <p class="intro">Kein Terminal, kein Homebrew. Remote Digger bringt alles mit, was es zum Laden und Umwandeln braucht, und hält es selbst aktuell.</p>
+    <div class="grid">
+      <div class="feat"><b>Ein Klick im Browser</b><span>Auf YouTube oder samplette auf das RD-Symbol klicken und das Format wählen.</span>
+        <div class="formats"><i>MP3 320</i><i>WAV</i><i>FLAC</i><i>MP4</i></div></div>
+      <div class="feat"><b>Ordnung von selbst</b><span>Du wählst einmal den Ordner. Darin entstehen „YouTube 1“, „YouTube 2“ … mit je 20 Dateien.</span></div>
+      <div class="feat"><b>Läuft im Hintergrund</b><span>Startet beim Anmelden, kein Fenster springt auf. „Lädt …“ und „Fertig“ kommen als Mitteilung oben rechts.</span></div>
+      <div class="feat"><b>Chrome oder Firefox</b><span>Die Erweiterung ist in der App dabei. Ein Knopf im Einrichten-Fenster führt dich durch die Installation.</span></div>
+      <div class="feat"><b>Nur in deinem WLAN</b><span>Die Fernbedienung geht nur im eigenen Netz und nur mit deinem persönlichen Link.</span></div>
+      <div class="feat"><b>Sauber wieder weg</b><span>Im Menü „Remote Digger deinstallieren …“ entfernt App, Einstellungen und Autostart. Deine Samples bleiben.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="installieren">
+  <div class="wrap">
+    <div class="kicker">Installation</div>
+    <h2>In drei Schritten<br>bereit.</h2>
+    <p class="intro">Remote Digger ist nicht bei Apple registriert. Darum fragt macOS beim allerersten Öffnen einmal nach, danach nie wieder.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Laden und reinziehen</h3><p>Die Datei „Remote-Digger.dmg“ öffnen und Remote Digger auf „Programme“ ziehen.</p></div>
+      <div class="step"><div class="n">2</div><h3>Einmal „Dennoch öffnen“</h3><p>Remote Digger öffnen. Wenn macOS es blockiert:</p><span class="path">Systemeinstellungen → Datenschutz &amp; Sicherheit → Dennoch öffnen</span></div>
+      <div class="step"><div class="n">3</div><h3>Einrichten</h3><p>Speicherort wählen, Erweiterung für Chrome oder Firefox installieren, QR-Code mit dem iPhone scannen und zum Home-Bildschirm hinzufügen.</p></div>
+    </div>
+    <div class="req"><span>Mac mit Apple-Chip (M1 oder neuer)</span><span>macOS 14 oder neuer</span><span>Chrome oder Firefox</span><span>iPhone im selben WLAN</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap faq">
+    <div class="kicker">Fragen</div>
+    <h2>Gut zu wissen.</h2>
+    <details><summary>Warum warnt macOS beim ersten Start?</summary><p>Apps, die nicht über ein kostenpflichtiges Apple-Entwicklerkonto signiert sind, blockiert macOS beim ersten Öffnen. Mit „Dennoch öffnen“ unter Systemeinstellungen → Datenschutz &amp; Sicherheit erlaubst du sie einmal, danach startet sie normal.</p></details>
+    <details><summary>Geht das auch mit Safari?</summary><p>Noch nicht. Remote Digger unterstützt Chrome und Firefox. Für Safari bräuchte es eine von Apple signierte Erweiterung.</p></details>
+    <details><summary>Läuft es auf älteren Intel-Macs?</summary><p>Nein, nur auf Macs mit Apple-Chip (M1, M2, M3, M4 …) und macOS 14 oder neuer.</p></details>
+    <details><summary>Warum reagiert das iPhone nicht?</summary><p>iPhone und Mac müssen im selben WLAN sein, und der Mac muss wach sein. Der Bildschirm darf aus sein. Und auf samplette.io muss ein Tab offen sein; das Abzeichen oben rechts zeigt „Mac“, wenn alles verbunden ist.</p></details>
+    <details><summary>Wie werde ich es wieder los?</summary><p>Remote Digger öffnen → Menü „Remote Digger“ → „Remote Digger deinstallieren …“. Danach noch die Browser-Erweiterung entfernen; die App sagt dir, wie.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Bereit zum Diggen?</h2>
+    <a class="cta" href="https://github.com/pheipen/remote-digger/releases/latest/download/Remote-Digger.dmg">
+      <span class="serif">Für Mac laden</span>
+      <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 5 V23 M9.5 15.5 L17 23 L24.5 15.5 M7 29 H27"/></svg>
+    </a>
+    <div class="meta">Version 2.1 · 95 MB · kostenlos</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="serif" style="font-size:22px;color:var(--ink)">Remote Digger</span>
+    <p>Privates Projekt, ohne Gewähr. Bitte nur Inhalte laden, die du herunterladen darfst. Enthält yt-dlp (Unlicense) und FFmpeg (GPL, Quellcode auf ffmpeg.org). Schriften: Instrument Serif und Inter Tight (SIL Open Font License).</p>
+  </div>
+</footer>
+
+</body>
+</html>
