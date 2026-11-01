@@ -55,7 +55,8 @@
   .meta a { color: var(--cobalt); font-weight: 600; text-decoration: none; }
 
   /* iPhone 18 Pro (silver aluminium) with the real remote on screen, built in CSS */
-  .phone { position: relative; justify-self: center; width: 300px; height: 624px; border-radius: 54px; padding: 4px; transform: rotate(3deg);
+  .phone { position: relative; justify-self: center; width: 300px; height: 624px; border-radius: 54px; padding: 4px;
+           transform: perspective(1400px) rotateX(4deg) rotateY(-18deg) rotateZ(2deg); will-change: transform;
            background: linear-gradient(140deg, #f4f5f7 0%, #b9bcc3 14%, #e9ebee 32%, #a3a7af 52%, #dcdee2 74%, #9b9fa7 90%, #e6e8eb 100%);
            box-shadow: inset 0 0 0 1px rgb(255 255 255 / .7), inset 0 0 3px 1px rgb(0 0 0 / .25),
                        0 60px 90px -40px rgb(21 23 58 / .55), 0 24px 40px -24px rgb(21 23 58 / .35); }
@@ -69,7 +70,8 @@
   .screen { position: relative; height: 100%; border-radius: 43px; background: var(--cream); padding: 48px 14px 26px;
             display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
   .screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-                   background: linear-gradient(118deg, rgb(255 255 255 / .22) 0%, rgb(255 255 255 / .06) 26%, transparent 42%); }
+                   background: linear-gradient(118deg, transparent 20%, rgb(255 255 255 / .26) 36%, rgb(255 255 255 / .07) 48%, transparent 62%);
+                   background-size: 300% 100%; background-position: var(--glare, 30%) 0; }
   .island { position: absolute; top: 11px; left: 50%; width: 62px; height: 22px; margin-left: -31px; border-radius: 12px; background: #000; z-index: 2; }
   .island::after { content: ""; position: absolute; right: 7px; top: 6px; width: 10px; height: 10px; border-radius: 50%;
                    background: radial-gradient(circle at 35% 35%, #2a3550 0%, #0b0f1c 45%, #000 70%); }
@@ -155,7 +157,6 @@
   @media (max-width: 900px) {
     .hero { padding: 24px 0 72px; }
     .hero .wrap { grid-template-columns: 1fr; gap: 56px; }
-    .phone { transform: none; }
     .buttons, .grid, .steps { grid-template-columns: 1fr; }
     .btn { min-height: 200px; }
     section { padding: 72px 0; }
@@ -167,7 +168,7 @@
     .lead { font-size: 18px; }
     nav .pill { padding: 0 16px; }
   }
-  @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } }
+  @media (prefers-reduced-motion: reduce) { .m-bar i { animation: none; } html { scroll-behavior: auto; } .phone { transform: none !important; } }
 </style>
 </head>
 <body>
@@ -309,5 +310,24 @@
   </div>
 </footer>
 
+<script>
+// The iPhone turns while it passes through the window: -1 = just coming in from below, 0 = centred, 1 = leaving at the top.
+(() => {
+  const phone = document.querySelector(".phone");
+  if (!phone || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let queued = false;
+  const update = () => {
+    queued = false;
+    const r = phone.getBoundingClientRect();
+    const p = Math.max(-1, Math.min(1, (innerHeight / 2 - (r.top + r.height / 2)) / (innerHeight / 2 + r.height / 2)));
+    phone.style.transform = `perspective(1400px) rotateX(${(4 - p * 10).toFixed(2)}deg) rotateY(${(-18 + p * 46).toFixed(2)}deg) rotateZ(${(2 - p * 4).toFixed(2)}deg)`;
+    phone.style.setProperty("--glare", `${(30 + p * 45).toFixed(1)}%`);
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  addEventListener("scroll", queue, { passive: true });
+  addEventListener("resize", queue);
+  update();
+})();
+</script>
 </body>
 </html>
