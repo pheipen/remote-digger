@@ -51,13 +51,17 @@ function resize() {
 function draw() {
   if (model) {
     const r = stage.getBoundingClientRect();
-    // back at the top of the page, display towards you when the phone is centred in the window, then a little further
     const centre = r.top + scrollY + r.height / 2 - innerHeight / 2;   // scrollY at which the phone is centred
-    const target = Math.max(centre, innerHeight * 0.5);                  // desktop: centred already, so turn over half a screen
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const deg = reduce ? 180 : scrollY <= target ? (180 * scrollY) / target : Math.min(270, 180 + (90 * (scrollY - target)) / innerHeight);
+    let deg;
+    if (centre > innerHeight * 0.5) {   // phone: starts below the fold; back first, display when centred, then a little further
+      deg = scrollY <= centre ? (180 * scrollY) / centre : Math.min(270, 180 + (90 * (scrollY - centre)) / innerHeight);
+    } else {                             // desktop: in view on load; display first, then three quarters until the hero is gone
+      deg = 180 + 270 * Math.min(1, scrollY / Math.max(1, r.bottom + scrollY));
+    }
+    if (reduce) deg = 180;
     pivot.rotation.y = (deg * Math.PI) / 180;   // 0° = back, 180° = display; three quarters of a turn in all
-    const t = deg / 270;
+    const t = Math.min(1, deg / 450);
     pivot.rotation.x = 0.12 - 0.1 * t;
     pivot.rotation.z = 0.05 - 0.08 * t;
     const fixed = new URLSearchParams(location.search).get("angle");   // preview: ?angle=<degrees>
