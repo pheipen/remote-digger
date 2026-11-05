@@ -26,11 +26,18 @@ new GLTFLoader().load(new URL("3d/iphone-17-pro.glb", import.meta.url).href, (gl
   model = gltf.scene;
   model.traverse((o) => {
     if (!o.isMesh) return;
-    for (const m of [].concat(o.material)) {
-      if (m.name === "OLED") { m.emissiveIntensity = 1; m.emissive.set(0xffffff); m.toneMapped = false; }   // exact page colours (model ships at 10)
-      if (m.name === "Glass") m.opacity = 0.06;                                                            // was 78 % black over the display
-      if (m.name === "Anodized aluminum") m.color.setScalar(0.78);                                      // silver instead of dark grey
-    }
+    const fix = (m) => {
+      if (m.name === "OLED") {   // the display is just the picture: no light, no reflection, no tone mapping, exact page colours
+        const map = m.emissiveMap || m.map;
+        map.colorSpace = THREE.SRGBColorSpace;
+        map.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        return new THREE.MeshBasicMaterial({ map, toneMapped: false, side: m.side });
+      }
+      if (m.name === "Glass") { m.opacity = 0; m.depthWrite = false; }   // was 78 % black (and reflective) over the display
+      if (m.name === "Anodized aluminum") m.color.setScalar(0.78);    // silver instead of dark grey
+      return m;
+    };
+    o.material = Array.isArray(o.material) ? o.material.map(fix) : fix(o.material);
   });
   const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3());
   model.position.sub(box.getCenter(new THREE.Vector3()));
